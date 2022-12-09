@@ -4,8 +4,10 @@ from django.views.generic import View, CreateView
 from django.contrib.auth.models import User
 from users.forms import NewUserForm
 from .forms import PortfolioForm
-from .models import Portfolio
+from .models import Portfolio, ip
 from django.contrib.auth.decorators import login_required
+import datetime
+
 
 
 class Index(View):
@@ -24,8 +26,15 @@ def portfolio(request):
     portfolio = Portfolio.objects.all()
     form = PortfolioForm()
     context = {'portfolio': portfolio, 'form':form}
-    print(context)
-    print(portfolio)
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ipaddress = x_forwarded_for.split(',')[-1].strip()
+    else:
+        ipaddress = request.META.get('REMOTE_ADDR')
+        get_ip= ip() 
+        get_ip.ip_address= ipaddress
+        get_ip.pub_date = datetime.date.today() 
+        get_ip.save()
     return render(request, 'portafolio.html', context)
 
 @login_required
@@ -33,20 +42,12 @@ def portafolio_import(request):
     portfolio = Portfolio.objects.all()
     context = {'portfolio': portfolio}
     form = PortfolioForm()
-#    print(context)
- #  print(portfolio)
     if request.method == 'POST':
-     #   print(request)
         form = PortfolioForm(request.POST, request.FILES)
         print(request.POST)
-    #    print(form)
         if form.is_valid():
-          #  print('ok!')
             form.save()
-          #  print('saved')
             return HttpResponseRedirect('portafolio')
         else:
             form = PortfolioForm()
-            #print('no entra')
-            #print(form.errors.as_json())
         return render(request, 'portafolio.html', context)
