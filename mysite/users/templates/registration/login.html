@@ -1,4 +1,5 @@
-{% extends "../base.html" %} {% block content %}
+{% extends "../base.html" %} 
+{% block content %}
 
 <div class="mt-5">
     <div class="card" style="width: 30%; margin: auto">
@@ -15,7 +16,11 @@
             </div>
             <div class="col-12 d-grid mt-3">
               <button type="submit" class="btn btn-primary">
-                Iniciar Session
+                Log in
+              </button>
+              <h3>Don't have an account?</h3>
+              <button type="button" class="btn btn-secondary">
+                <a href="{% url 'register' %}">Create account</a>
               </button>
             </div>
           </div>
